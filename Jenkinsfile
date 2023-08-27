@@ -5,11 +5,9 @@ pipeline {
         jdk 'jdk11'
         maven 'maven3'
     }
-    
-    environment{
+      environment{
         SCANNER_HOME= tool 'sonar-scanner'
     }
-
     stages {
         stage('Git Checkout ') {
             steps {
@@ -28,48 +26,58 @@ pipeline {
                     sh "mvn test"
             }
         }
-
-        stage('Sonarqube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
-                    withSonarQubeEnv('sonar-server') {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Java-WebApp \
-                        -Dsonar.java.binaries=. \
-                        -Dsonar.projectKey=Java-WebApp '''
-
-                }
-            }
+                withSonarQubeEnv('sonar-scanner') {
+                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Java-WebApp \
+                -Dsonar.java.binaries=. \
+                -Dsonar.projectKey=Java-WebApp'''
         }
+    }
+}
 
-        stage('OWASP Dependency Check') {
+         stage('OWASP Dependency Check') {
             steps {
-                   dependencyCheck additionalArguments: '--scan ./   ', odcInstallation: 'DP'
+                   dependencyCheck additionalArguments: '--scan ./ --format HTML ', odcInstallation: 'DP'
                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
 
-        stage('Maven Build') {
+          stage('Maven Build') {
             steps {
-                    sh "mvn clean compile"
+                    sh "mvn clean install"
             }
         }
+         stage('Docker Build') {
+            steps{
+                script{
+                    sh "docker build -t webapp ."
+                    sh "docker tag webapp emrahuzdilli/webapp:latest"
+            }
+          }
+        }
 
-        stage('Docker Build & Push') {
+        stage('Docker Push') {
             steps {
                    script {
-                       withDockerRegistry(credentialsId: '89d444e6-f3c3-4602-b765-d99c550b0cf5', toolName: 'Docker') {
-                            sh "docker build -t webapp ."
-                            sh "docker tag webapp emrah-uzdilli/webapp:latest"
-                            sh "docker push adijaiswal/webapp:latest "
+                       withCredentials([string(credentialsId: 'Dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                            sh "docker login -u emrahuzdilli -p ${dockerhubpwd}"
+                            sh "docker push emrahuzdilli/webapp:latest "
                         }
                    }
             }
         }
-
-        stage('Docker Image scan') {
+         stage('TRIVY Image Scanner') {
             steps {
-                    sh "trivy image emrah-uzdilli/webapp:latest "
+                    sh "trivy image emrahuzdilli/webapp:latest"
             }
         }
+        stage('CD Trigger') {
+            steps {
+                    build job:"AutomationVulnerabilities_CD" , wait:true
+            }
+        }
+
 
     }
 }
