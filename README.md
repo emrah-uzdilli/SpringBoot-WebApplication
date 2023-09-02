@@ -1,9 +1,7 @@
 # SpringBoot-WebApplication
 #Emrah UZDILLI- CI/CD Pipilene using DEVSECOPS......
 #Trigger Test...
-~Test...
-,,
-ffdsfsada
-fsdgj
-ragsh
-dsad
+
+# SpringBoot-WebApplication
+# SpringBoot-WebApplication
+# SpringBoot-WebApplication....
