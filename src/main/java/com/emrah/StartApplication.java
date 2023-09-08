@@ -13,7 +13,7 @@ public class StartApplication {
     @GetMapping("/")
     public String index(final Model model) {
         model.addAttribute("title", "This is a SpringBoot Static Web Application");
-        model.addAttribute("msg", "Application Is Deployed By Emrah UZDILLI  And This is Test Commit");
+        model.addAttribute("msg", "Application Is Deployed By Emrah UZDILLI and Hello World ");
         return "index";
     }
 
