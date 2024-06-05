@@ -1,5 +1,5 @@
 # ZERO TOUCH AUTOMATION SOFTWARE PREVENTING SECURITY VULNERABILITY
-# Trigger Test...
+
 ![Mind map](https://github.com/emrah-uzdilli/DevSecOps-WebApplication/assets/62702253/5abe489e-38e1-410d-a2bf-ccf6d6d308e8)
 
 # Emrah UZDILLI- CI/CD Pipilene using DEVSECOPS......
